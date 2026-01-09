@@ -1,6 +1,7 @@
 import './globals.css';
 import Link from 'next/link';
 import { apiFetchServer } from './lib/api.server';
+import LogoutButton from './ui/LogoutButton';
 
 type MeRes = { user: { id: string; username?: string } | null };
 
@@ -34,12 +35,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </Link>
 
               {isLoggedIn ? (
-                <Link
+                <><Link
                   href={`/profile/${me!.id}`}
                   className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
                 >
                   Profile
                 </Link>
+                <LogoutButton /></>
               ) : (
                 <>
                   <Link
