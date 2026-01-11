@@ -2,6 +2,7 @@ import './globals.css';
 import Link from 'next/link';
 import { apiFetchServer } from './lib/api.server';
 import LogoutButton from './ui/LogoutButton';
+import ThemeToggle from './ui/ThemeToggle';
 
 type MeRes = { user: { id: string; username?: string } | null };
 
@@ -19,46 +20,49 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-100 font-sans text-gray-900">
-        <header className="sticky top-0 z-50 border-b bg-white">
+      <body className="min-h-screen bg-bg text-fg">
+        <header className="sticky top-0 z-50 border-b border-border bg-card">
           <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <Link href="/" className="text-lg font-bold tracking-tight text-blue-600 hover:text-blue-700">
+            <Link href="/" className="text-lg font-bold tracking-tight text-blue-600">
               🐦 TwitterClone
             </Link>
 
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
-              >
+            <div className="flex items-center gap-3">
+              <Link href="/" className="rounded-md px-3 py-1.5 text-sm hover:bg-muted">
                 Feed
               </Link>
 
+
               {isLoggedIn ? (
-                <><Link
-                  href={`/profile/${me!.id}`}
-                  className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
-                >
-                  Profile
-                </Link>
-                <LogoutButton /></>
+                <>
+                  <Link
+                    href={`/profile/${me!.id}`}
+                    className="rounded-md px-3 py-1.5 text-sm hover:bg-muted"
+                  >
+                    Profile
+                  </Link>
+                  <LogoutButton />
+                </>
               ) : (
                 <>
                   <Link
                     href="/auth/login"
-                    className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                    className="rounded-md px-3 py-1.5 text-sm hover:bg-muted"
                   >
                     Login
                   </Link>
 
                   <Link
                     href="/auth/register"
-                    className="rounded-full bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
+                    className="rounded-md px-3 py-1.5 text-sm hover:bg-muted"
                   >
                     Register
                   </Link>
                 </>
               )}
+
+              
+              <ThemeToggle />
             </div>
           </nav>
         </header>

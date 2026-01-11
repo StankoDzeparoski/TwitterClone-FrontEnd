@@ -3,13 +3,16 @@ import { NextResponse } from 'next/server';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
-export async function POST(_: Request, { params }: { params: Promise<{ postId: string }> }) {
-  const { postId } = await params;
+export async function POST(
+  _: Request,
+  { params }: { params: Promise<{ commentId: string }> }
+) {
+  const { commentId } = await params;
 
   const token = (await cookies()).get('token')?.value;
   if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  const res = await fetch(`${API_URL}/posts/${postId}/retweet`, {
+  const res = await fetch(`${API_URL}/comments/${commentId}/repost`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
   });

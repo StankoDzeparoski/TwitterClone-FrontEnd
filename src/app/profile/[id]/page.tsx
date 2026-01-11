@@ -4,7 +4,6 @@ import PostCard from '../../ui/PostCard';
 import FollowButton from '../../ui/profile/FollowButton';
 import FollowListsToggle from '../../ui/profile/FollowListsToggle';
 
-
 type MeRes = { user: { id: string } | null };
 
 type PublicUser = {
@@ -22,7 +21,6 @@ type PublicUser = {
 
 type UserRes = { user: PublicUser | null };
 type FeedRes = { items: any[]; nextCursor: string | null };
-
 type IdListRes = { items: string[] };
 
 async function safeGetMe() {
@@ -64,30 +62,31 @@ export default async function ProfilePage({
   if (!user) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-6">
-        <h1 className="text-xl font-semibold">User not found</h1>
+        <div className="rounded-2xl border border-border bg-card p-4 text-card-fg shadow-sm">
+          <h1 className="text-xl font-semibold">User not found</h1>
+        </div>
       </main>
     );
   }
 
-  // fetch follower/following lists (IDs) for display
   const [followersRes, followingRes] = await Promise.all([
-    apiFetchServer<IdListRes>(`/users/${id}/followers`, { cache: 'no-store' }).catch(() => ({ items: [] })),
-    apiFetchServer<IdListRes>(`/users/${id}/following`, { cache: 'no-store' }).catch(() => ({ items: [] })),
+    apiFetchServer<IdListRes>(`/users/${id}/followers`, { cache: 'no-store' }).catch(() => ({
+      items: [],
+    })),
+    apiFetchServer<IdListRes>(`/users/${id}/following`, { cache: 'no-store' }).catch(() => ({
+      items: [],
+    })),
   ]);
 
   const followerIds = followersRes.items ?? [];
   const followingIds = followingRes.items ?? [];
-
   const followersCount = followerIds.length;
   const followingCount = followingIds.length;
 
-  // does ME follow this profile?
   const iFollowThisUser =
     isLoggedIn && !isMe ? (user.userFollowersIds ?? followerIds).includes(me!.id) : false;
 
-  // Load posts depending on tab
   let items: any[] = [];
-
   if (tab === 'posts') {
     const data = await apiFetchServer<FeedRes>(`/posts/user/${id}?limit=20`, { cache: 'no-store' });
     items = data.items;
@@ -103,27 +102,43 @@ export default async function ProfilePage({
 
   const tabLink = (t: string) => `/profile/${id}?tab=${t}`;
 
+  // const tabBtnBase =
+  // 'inline-flex items-center rounded-full border border-border bg-card px-4 py-2 text-sm font-medium shadow-sm transition hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring/30';
+
+  // const tabBtnActive =
+  // 'border-transparent bg-fg text-bg hover:bg-fg/90';
+
+  const tabBtnBase =
+  'inline-flex items-center rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-fg shadow-sm transition ';
+  // 'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring/30'
+
+  const tabBtnActive =
+  'border-transparent bg-fg !text-bg hover:opacity-90';
+
+
+
+
   return (
-    <main className="mx-auto max-w-2xl px-4 py-6">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <main className="mx-auto max-w-2xl px-4 py-6 text-fg">
+      {/* Profile header card */}
+      <div className="rounded-2xl border border-border bg-card p-4 text-card-fg shadow-sm">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-xl font-semibold text-zinc-900">
-              Profile: <span className="text-zinc-600">@{user.id}</span>
+            <h1 className="text-xl font-semibold">
+              Profile: <span className="font-semibold">@{user.id}</span>
             </h1>
 
-            <p className="mt-1 text-sm text-zinc-600">
-              Followers: <span className="font-medium text-zinc-900">{followersCount}</span> · Following:{' '}
-              <span className="font-medium text-zinc-900">{followingCount}</span>
+            <p className="mt-1 text-sm text-muted-fg">
+              Followers: <span className="font-medium text-fg">{followersCount}</span> · Following:{' '}
+              <span className="font-medium text-fg">{followingCount}</span>
             </p>
           </div>
 
-          {/* Right-side actions */}
           <div className="flex items-center gap-2">
             {!isLoggedIn ? (
               <Link
                 href="/auth/login"
-                className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50"
+                className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-fg shadow-sm hover:bg-muted"
               >
                 Login to interact
               </Link>
@@ -133,55 +148,35 @@ export default async function ProfilePage({
           </div>
         </div>
 
-        {/* moved /me useful bits here */}
+        {/* "You" box */}
         {isMe ? (
-          <div className="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-700">
-            <div className="font-medium text-zinc-900">You</div>
-            <div className="mt-1 text-xs text-zinc-500">
+          <div className="mt-3 rounded-xl border border-border bg-muted p-3 text-sm">
+            <div className="font-medium">You</div>
+            <div className="mt-1 text-xs text-muted-fg">
               Liked: {user.likedPostIds?.length ?? 0} · Reposted: {user.repostedPostIds?.length ?? 0}
             </div>
           </div>
         ) : null}
 
-        {/* Followers / Following toggle UI */}
-        <FollowListsToggle
-          profileUserId={id}
-          followerIds={followerIds}
-          followingIds={followingIds}
-        />
+        {/* Followers / Following toggle */}
+        <div className="mt-4">
+          <FollowListsToggle profileUserId={id} followerIds={followerIds} followingIds={followingIds} />
+        </div>
 
         {/* Tabs */}
-        <div className="mt-4 flex gap-2">
-          <Link
-            href={tabLink('posts')}
-            className={`rounded-xl px-3 py-2 text-sm ${
-              tab === 'posts'
-                ? 'bg-zinc-900 text-white'
-                : 'border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
-            }`}
-          >
-            Posts
-          </Link>
-          <Link
-            href={tabLink('liked')}
-            className={`rounded-xl px-3 py-2 text-sm ${
-              tab === 'liked'
-                ? 'bg-zinc-900 text-white'
-                : 'border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
-            }`}
-          >
-            Liked
-          </Link>
-          <Link
-            href={tabLink('reposted')}
-            className={`rounded-xl px-3 py-2 text-sm ${
-              tab === 'reposted'
-                ? 'bg-zinc-900 text-white'
-                : 'border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
-            }`}
-          >
-            Reposted
-          </Link>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {(['posts', 'liked', 'reposted'] as const).map((t) => {
+            const active = tab === t;
+            return (
+              <Link
+                key={t}
+                href={tabLink(t)}
+                className={`${tabBtnBase} ${active ? tabBtnActive : ''}`}
+              >
+                {t[0].toUpperCase() + t.slice(1)}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
@@ -190,7 +185,7 @@ export default async function ProfilePage({
         {items.length ? (
           items.map((p) => <PostCard key={p.id} post={p} isLoggedIn={isLoggedIn} />)
         ) : (
-          <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600 shadow-sm">
+          <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-fg shadow-sm">
             No items in this tab.
           </div>
         )}

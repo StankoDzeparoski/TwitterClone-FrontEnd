@@ -15,11 +15,10 @@ export default function RetweetButton({
   const [busy, setBusy] = useState(false);
 
   async function toggle() {
-    if (!isLoggedIn || busy) return; // ✅ hard guard
+    if (!isLoggedIn || busy) return;
     setBusy(true);
 
     try {
-      // await apiFetch(`/posts/${postId}/retweet`, { method: 'POST' });
       await apiFetch(`/api/posts/${postId}/retweet`, { method: 'POST' });
       router.refresh();
     } catch (e: any) {
@@ -41,7 +40,7 @@ export default function RetweetButton({
       onClick={toggle}
       disabled={disabled}
       title={!isLoggedIn ? 'Login to repost' : undefined}
-      className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 shadow-sm hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+      className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-fg shadow-sm hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
     >
       🔁 {busy ? '...' : 'Repost'}
     </button>

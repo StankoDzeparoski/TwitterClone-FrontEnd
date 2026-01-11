@@ -19,9 +19,7 @@ export default function FollowButton({
     setBusy(true);
 
     try {
-      const res = await fetch(`/api/users/${targetUserId}/follow`, {
-        method: 'POST',
-      });
+      const res = await fetch(`/api/users/${targetUserId}/follow`, { method: 'POST' });
 
       if (res.status === 401) {
         router.push('/auth/login');
@@ -34,28 +32,27 @@ export default function FollowButton({
       }
 
       const data = (await res.json()) as { following?: boolean };
-
-      // backend returns { ok: true, following: boolean }
       if (typeof data.following === 'boolean') setFollowing(data.following);
 
-      // re-render server components (counts/lists)
       router.refresh();
     } finally {
       setBusy(false);
     }
   }
 
+  const base =
+    'inline-flex items-center rounded-full px-4 py-2 text-sm font-medium shadow-sm transition focus:outline-none focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-60';
+
+  const primary = 'bg-fg text-bg hover:bg-fg/90';
+  const outline = 'border border-border bg-card text-fg hover:bg-muted';
+
   return (
     <button
       onClick={toggle}
       disabled={busy}
-      className={`rounded-xl px-3 py-2 text-sm shadow-sm disabled:cursor-not-allowed disabled:opacity-60 ${
-        following
-          ? 'border border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50'
-          : 'bg-zinc-900 text-white hover:bg-black'
-      }`}
+      className={`${base} ${following ? outline : primary}`}
     >
-      {busy ? '...' : following ? 'Unfollow' : 'Follow'}
+      {busy ? '…' : following ? 'Unfollow' : 'Follow'}
     </button>
   );
 }
