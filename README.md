@@ -1,4 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+The project is a twitter clone for which I have implemented the following features:
+- User registration and login
+- Creating a post (tweet)
+- Feed displaying posts
+- Like functionality
+- Retweet functionality
+- User profile page
+- Display of own and other user’s posts
+- Comments on posts
+- Follow / Unfollow system
+- Image upload in posts
+- Dark / Light theme
+
+Additional features I have implemented are separate feeds for posts(following/discover), on the profile page view your own posts, posts you have liked and posts you have reposted, on the profile page view list of followers/following, repost/bookmark comments. 
+
+The working demo application is available at https://twitterclone-frontend-vercel.vercel.app/, if you want you can also run it locally through the front-end code provided in the repo using npm run dev
+The back-end code can not be run locally as I haven't done the setup for that
+
+Technologies used for front-end development: NextJS, TailwindCSS
+Technologies used for back-end development: NestJS, AWS Services(DynamoDB,S3,Lambda), Vercel hosting.
 
 ## Getting Started
 
